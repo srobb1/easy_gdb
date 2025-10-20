@@ -17,27 +17,13 @@ else {
   //print("<pre>".print_r($gNamesArr,true)."</pre>");
  
  
+if ($database_type == 'sqlite'){
+  $db = $sqlite_db_path;
+}elseif($database_type == 'postgres'){
 	// Connecting to db
   $dbconn = pg_connect(getConnectionString());
- 
-  // Get annotation types
-  include_once("get_annotation_types.php");
-  
-	// load annotation links in hash
-	$annot_hash;
-
-	if ( file_exists("$json_files_path/tools/annotation_links.json") ) {
-	    $annot_json_file = file_get_contents("$json_files_path/tools/annotation_links.json");
-	    $annot_hash = json_decode($annot_json_file, true);
-	}
-	
-	// Getting all annotation types.
-  $query="SELECT annotation_type_id,annotation_type from annotation_type"; // array with annotation type ids
-
   $res=pg_query($query) or die("Couldn't query database.");
-
   $annotTypes=pg_fetch_all_columns($res);
-
   $gNameValues=implode(",",array_map(function($input) {if(empty(trim($input))) return ""; else  return "'" . trim(pg_escape_string($input))."'" ;},$gNamesArr));
   
   $query="SELECT searchValues.search_name as \"input\", array_agg( distinct (g.gene_name)) as \"genes\", array_agg(distinct (annotation.annotation_term, annotation.annotation_desc, annotation.annotation_type_id)) \"annot\"
@@ -50,7 +36,29 @@ else {
   order by searchValues.ord asc";
   
   $dbRes=pg_query($query) or die('Query failed: ' . pg_last_error());
+ 
+}
+  // Get annotation types
+  include_once("get_annotation_types.php");
   
+	// load annotation links in hash
+	$annot_hash;
+
+	if ( file_exists("$json_files_path/tools/annotation_links.json") ) {
+	    $annot_json_file = file_get_contents("$json_files_path/tools/annotation_links.json");
+	    $annot_hash = json_decode($annot_json_file, true);
+	}
+// Build a string of placeholders: ?,?,?...
+  $placeholders = implode(',', array_fill(0, count($gNamesArr), '?'));
+
+	// Getting all annotation types.
+  $query="SELECT annotation_type, annotation_source_name from annotation_source as, annotation a, feature_annotation fa, feature f where f.feature_id = fa.feature_id and fa.annotation_id = a.annotation_id and a.annotation_source_id = as.annotation_source_id and f.feature_id in ($placeholders)"; // array with annotation type ids
+  $params = array_merge(["%$desc_input%"], $gNamesArr);
+  $results = fetchData($query, $params, $db);
+
+  if ($results){
+
+ 
   
   echo "<table class=\"table table-striped table-bordered\" id=\"tblResults\"><thead><tr><th>input</th>";
 

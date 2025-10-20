@@ -87,7 +87,8 @@
   function _get_subject_link($s_link_hash,$db_name,$subject_name,$s_start,$s_end,$annot_file) {
     
     $db_name = str_replace(' ',"_", $db_name);
-    $s_link = "/easy_gdb/gene.php?name={$subject_name}&annot={$annot_file}";
+    $s_link = "/easy_gdb/tools/search/parent.php?name={$subject_name}";
+    #$s_link = "/easy_gdb/gene.php?name={$subject_name}&annot={$annot_file}";
     $target_type="_blank";
     
     //if ($s_link_hash[$db_name]) {

@@ -1,43 +1,49 @@
 <?php
-// include_once "db_paths.php";
-// File is ignored by .gitignore - should contain:
-// getBlastdbcmdPath and getBlastdbBaseLocation.
-// These functions are returning corresponding paths and taking no arguments. Path of directory ends with /
-
 
 function getFastaFile($gids,$dbPath) {
-  // $blastdbcmdPath=getBlastdbcmdPath();
+    $command = "blastdbcmd -db " . escapeshellarg($dbPath) . " -entry " . escapeshellarg(implode(",", $gids)) . " | sed 's/lcl|//'";
+    $descriptors = [
+        0 => ["pipe", "r"],  // stdin
+        1 => ["pipe", "w"],  // stdout
+        2 => ["pipe", "w"],  // stderr
+    ];
 
-  // echo $blastdbcmdPath."\n";
-  // echo $blastDbLocation."\n";
-  // echo escapeshellarg(implode(",",$gids))."\n";
+    $process = proc_open($command, $descriptors, $pipes);
 
-	exec("blastdbcmd -db {$dbPath} -entry " . escapeshellarg(implode(",",$gids)) ."| sed 's/lcl|//'" ,$ret);
-  // exec("{$blastdbcmdPath} -db {$dbPath} -entry " . escapeshellarg(implode(",",$gids)) ."| sed 's/lcl|//'" ,$ret);
-	return implode("\n",$ret);
+    $ret = '';
+    $stderr = '';
+
+    if (is_resource($process)) {
+        fclose($pipes[0]); // stdin
+        $ret = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+
+        proc_close($process);
+    }
+
+    return ['stdout' => $ret, 'stderr' => trim($stderr)];
 }
 
+if(isset($_POST["gids"]) && isset($_POST["blast_db"])) {
+    $gids = array_map('trim', explode("\n", $_POST["gids"]));
+    $dbPath = $_POST["blast_db"];
 
-if(isset($_POST["gids"])) {
+    $result = getFastaFile($gids, $dbPath);
 
-  if(isset($_POST["blast_db"])) {
-		header('Content-Type: application/octet-stream');
-		$filename="egdb_sequences_" . date("Y-m-d.His") . ".fasta";
-		header("Content-Disposition: attachment;filename={$filename}");
-
-    $gids=array_map(function($row) {
-			return trim($row);
-		}
-		,explode("\n",$_POST["gids"]));
-
-    // echo $_POST["blast_db"]."\n";
-    // echo $_POST["gids"]."\n";
-    // echo $gids."\n";
-
-		echo getFastaFile($gids,$_POST["blast_db"]);
-
-  }
-
+    // Detect AJAX request
+    if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode($result);
+        exit;
+    } else {
+        // Regular form submit -> force download
+        header('Content-Type: application/octet-stream');
+        $filename = "downloaded_sequences_" . date("Y-m-d.His") . ".fasta";
+        header("Content-Disposition: attachment;filename={$filename}");
+        echo $result['stdout'];
+        exit;
+    }
 }
-
 ?>

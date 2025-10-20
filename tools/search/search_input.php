@@ -3,6 +3,7 @@
 <?php include_once realpath("../modal.html");?>
 <!-- INFO -->
 <?php include_once realpath("search_info_modal.php");?>
+<?php include_once realpath("$root_path/easy_gdb/tools/common_functions.php");?>
 
 <!-- HELP -->
 <div class="margin-20">
@@ -102,6 +103,32 @@
         }
 
       }//if file_database
+      else {
+          if ($database_type == 'sqlite'){
+            $db = $sqlite_db_path;
+          }
+          $query = "SELECT o.organism_id, o.genus, o.species, o.common_name, o.subtype
+                    FROM organism o
+                    ";
+          $results = fetchData($query,[], $db);
+	  echo "<label for=\"organism\">Limit Search to:</label>";
+          echo "<div class='row'>";
+          foreach ($results as $row){
+            $id = htmlspecialchars($row['organism_id']);   // use organism_id
+            $label = htmlspecialchars($row['common_name'] ." (". ($row['genus']." ".$row['species'] .")" ));
+            echo "<div class='col-md-4'>";
+            echo "<div class=\"form-check\">";
+            echo "  <input class=\"form-check-input organism_checkbox\" type=\"checkbox\" name=\"organism[]\" value=\"$id\" id=\"org_$id\" checked>";
+            echo "  <label class=\"form-check-label\" for=\"org_$id\">$label</label>";
+            echo "</div>";
+            echo "</div>";
+
+          } 
+
+echo "</div>"; // close row
+
+
+      }
     ?>
 
     <br>
@@ -155,6 +182,7 @@ $(document).ready(function () {
     var data_set_selected = false;
     var file_database = "<?php echo $file_database; ?>";
     var select_field = $('.sample_checkbox').length > 0;
+    var organism_selected = false;
 
     if (select_field) {
       $('.sample_checkbox').each(function() {
@@ -166,6 +194,11 @@ $(document).ready(function () {
     }
 
     // Forms
+    if ($('.organism_checkbox:checked').length === 0) {
+      $("#search_input_modal").html("At least one organism needs to be selected");
+      $('#no_gene_modal').modal();
+      return false; // stop form submission
+    }
     if (!gene_id) {
       $("#search_input_modal").html( "No input provided in the search box" );
       $('#no_gene_modal').modal();
@@ -188,3 +221,4 @@ $(document).ready(function () {
 });
 
 </script>
+
