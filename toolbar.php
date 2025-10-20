@@ -8,13 +8,13 @@
   
 <?php 
   if ($db_logo && file_exists(realpath("$root_path/$images_path/$db_logo"))) {      
-    echo "<a class=\"navbar-brand\" href=\"/easy_gdb/index.php\" style=\"margin-right:5px\"><img id=\"site_logo\" src=$images_path/$db_logo alt=\"DB_Logo\" style=\"height:25px; vertical-align:text-bottom;\"></a>";
+    echo "<a class=\"navbar-brand\" href=\"/index.php\" style=\"margin-right:5px\"><img id=\"site_logo\" src=$images_path/$db_logo alt=\"DB_Logo\" style=\"height:25px; vertical-align:text-bottom;\"></a>";
   }
 ?>
 
 <?php 
   if (!$tb_rm_home) {
-    echo "<a class=\"navbar-brand\" href=\"/easy_gdb/index.php\"> $dbTitle</a>";
+    echo "<a class=\"navbar-brand\" href=\"/$group/index.php\"> $dbTitle</a>";
   }
 ?>
 
@@ -27,7 +27,7 @@
     <ul class="navbar-nav">
       <?php 
         if ($tb_species) {
-          echo '<li class="nav-item"><a class="nav-link" href="/easy_gdb/species.php">Species</a></li>';
+          echo '<li class="nav-item"><a class="nav-link" href="/'.$group.'/species.php">Species</a></li>';
         }
         
         if ($tb_tools) {
@@ -36,28 +36,26 @@
           echo '<div class="dropdown-menu">';
           
           if ($tb_search) {
-            echo '<a class="dropdown-item" href="/easy_gdb/tools/search/search_input.php">Search</a>';
+            echo '<a class="dropdown-item" href="/'.$group.'/tools/search/search_input.php">Search</a>';
           }
           if ($tb_blast) {
-            echo '<a class="dropdown-item" href="/easy_gdb/tools/blast/blast_input.php">BLAST</a>';
+            echo '<a class="dropdown-item" href="/'.$group.'/tools/blast/blast_input.php">BLAST</a>';
           }
           if ($tb_jbrowse) {
             echo '<a class="dropdown-item jbrowse_link" href="/jbrowse/" target="_blank">Genome Browser</a>';
           }
-          if ($tb_jbrowse2) {
-            echo '<a class="dropdown-item jbrowse_link" href="/jbrowse2/" target="_blank">Synteny Viewer</a>';
-          }
           if ($tb_seq_ext) {
-            echo '<a class="dropdown-item" href="/easy_gdb/tools/fasta_download.php">Sequence Extraction</a>';
+            echo '<a class="dropdown-item" href="/'.$group.'/tools/fasta_download.php">Sequence Extraction</a>';
           }
           if ($tb_annot_ext) {
-            echo '<a class="dropdown-item" href="/easy_gdb/tools/annot_input_list.php">Annotation Extraction</a>';
+            echo '<a class="dropdown-item" href="/'.$group.'/tools/search/annot_search_input.php">Annotation Extraction</a>';
+            #echo '<a class="dropdown-item" href="/'.$group.'/tools/annot_input_list.php">Annotation Extraction</a>';
           }
           if ($tb_lookup) {
-            echo '<a class="dropdown-item" href="/easy_gdb/tools/gene_lookup.php">Gene Version Lookup</a>';
+            echo '<a class="dropdown-item" href="/'.$group.'/tools/gene_lookup.php">Gene Version Lookup</a>';
           }
           if ($tb_enrichment) {
-            echo '<a class="dropdown-item" href="/easy_gdb/tools/gene_enrichment.php">Gene Set Enrichment</a>';
+            echo '<a class="dropdown-item" href="/'.$group.'/tools/gene_enrichment.php">Gene Set Enrichment</a>';
           }
           
           echo '</div>';
@@ -68,9 +66,9 @@
           echo '<li class="nav-item dropdown">';
             echo '<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Expression Atlas</a>';
             echo '<div class="dropdown-menu">';
-              echo '<a class="dropdown-item" href="/easy_gdb/tools/expression/expression_input.php">Expression viewer</a>';
-              echo '<a class="dropdown-item" href="/easy_gdb/tools/expression/comparator_input.php">Expression comparator</a>';
-              echo '<a class="dropdown-item" href="/easy_gdb/tools/expression/expression_menu.php">Datasets</a>';
+              echo '<a class="dropdown-item" href="/'.$group.'/tools/expression/expression_input.php">Expression viewer</a>';
+              echo '<a class="dropdown-item" href="/'.$group.'/tools/expression/comparator_input.php">Expression comparator</a>';
+              echo '<a class="dropdown-item" href="/'.$group.'/tools/expression/expression_menu.php">Datasets</a>';
             echo '</div>';
           echo '</li>';
         }
@@ -79,18 +77,18 @@
           echo '<li class="nav-item dropdown">';
             echo '<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Passport and Phenotype</a>';
             echo '<div class="dropdown-menu">';
-              echo '<a class="dropdown-item" href="/easy_gdb/tools/passport/view_subdirectories.php">Navigation</a>';
-              echo '<a class="dropdown-item" href="/easy_gdb/tools/passport/passport_search_input.php">Search</a>';
+              echo '<a class="dropdown-item" href="/'.$group.'/tools/passport/view_subdirectories.php">Navigation</a>';
+              echo '<a class="dropdown-item" href="/'.$group.'/tools/passport/passport_search_input.php">Search</a>';
             echo '</div>';
           echo '</li>';
         }
         
         if ($tb_downloads) {
-          echo '<li class="nav-item"><a class="nav-link" href="/easy_gdb/downloads.php">Downloads</a></li>';
+          echo '<li class="nav-item"><a class="nav-link" href="/'.$group.'/downloads.php">Downloads</a></li>';
         }
         
         if ($tb_about) {
-          echo '<li class="nav-item"><a class="nav-link" href="/easy_gdb/about.php">About</a></li>';
+          echo '<li class="nav-item"><a class="nav-link" href="/'.$group.'/about.php">About</a></li>';
         }
 
         if ($tb_more) {
@@ -98,7 +96,7 @@
         }
 
         if ($tb_help) {
-          echo '<li class="nav-item"><a class="nav-link" href="/easy_gdb/help/00_help.php">Help</a></li>';
+          echo '<li class="nav-item"><a class="nav-link" href="/'.$group.'/help/00_help.php">Help</a></li>';
         }
 
         if ($tb_custom) {
@@ -113,34 +111,18 @@
     </ul>
   
   <?php
-  if ($tb_search_box) {
-    if ($file_database) {
-      echo '<div class="ml-auto">';
-      // echo '<div class="d-flex mt-2 mt-md-0 justify-content-start justify-content-md-end w-100">';
-      echo '<form class="input-group" id="egdb_search_file_form" action="/easy_gdb/tools/search/search_output_file.php" method="get" style="width: auto;">';
-      echo '<input type="search" class="form-control" id="search_file_box" name="search_keywords" placeholder="Search">';
-      echo '<input type="hidden" name="search_all" value="1">';
-      echo '<div class="input-group-append">';
-      echo '<button type="submit" class="btn btn-info">';
-      echo '<i class="fa fa-search" style="font-size:16px;color:white"></i>';
-      echo '</button>';
-      echo '</div>';
-      echo '</form>';
-      echo '</div>';
-    }
-    else {
-        echo '<form class="ml-auto form-inline" id="egdb_search_form" action="/easy_gdb/tools/search/search_output.php" method="get">';
+    if ($tb_search_box) {
+      echo '<form class="ml-auto form-inline" id="egdb_search_form" action="/easy_gdb/tools/search/search_output.php" method="get">';
         echo '<input type="search_box" class="form-control mr-sm-2" id="search_box" name="search_keywords" placeholder="Search">';
         echo '<button type="submit" class="btn btn-info"><i class="fa fa-search" style="font-size:16px;color:white"></i></button>';
-        echo '</form>';
-      }
+      echo '</form>';
     }
 
     // if ($tb_login) {
     //     echo'<a id="login_link" class="ml-auto" style="color:white; cursor:pointer" data-toggle="modal" data-target="#loginModal">Log In <i class="fa fa-sign-in-alt" style="font-size:16px;color:white"></i></a>';
     //     echo'<a id="logout_link" class="ml-auto" style="color:white; cursor:pointer; display:none">Log Out <i class="fa fa-sign-out-alt" style="font-size:16px;color:white"></i></a>';
     // }
-  ?>
+ ?>
   
   </div>
 

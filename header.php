@@ -1,11 +1,23 @@
 <!doctype html>
 <html lang="en">
 <?php
-if (file_exists($_SERVER['DOCUMENT_ROOT']."/easy_gdb/configuration_path.php") ) {
-  include_once($_SERVER['DOCUMENT_ROOT']."/easy_gdb/configuration_path.php");
-} elseif (file_exists($_SERVER['DOCUMENT_ROOT']."/configuration_path.php") ) {
-  include_once($_SERVER['DOCUMENT_ROOT']."/configuration_path.php");
- }
+//if (file_exists($_SERVER['DOCUMENT_ROOT']."/easy_gdb/configuration_path.php") ) {
+//  include_once($_SERVER['DOCUMENT_ROOT']."/easy_gdb/configuration_path.php");
+//  echo "yes 1";
+//} elseif (file_exists($_SERVER['DOCUMENT_ROOT']."/configuration_path.php") ) {
+//  include_once($_SERVER['DOCUMENT_ROOT']."/configuration_path.php");
+//  echo "yes 2";
+// }
+
+$uri = $_SERVER['REQUEST_URI']; // e.g. "/bats/index.php"
+$parts = explode('/', trim($uri, '/'));
+$group = $parts[0];
+if($group === ''){
+  $group = 'Public';
+}
+
+
+$conf_path='/var/www/html/'.$group.'/'.$group.'_data/egdb_conf/';
 include_once "$conf_path/easyGDB_conf.php";
 ?>
 
@@ -17,9 +29,9 @@ include_once "$conf_path/easyGDB_conf.php";
 
     <!-- compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- <link rel="stylesheet" href="/easy_gdb/css/bootstrap.min.css"> -->
-    <link rel="stylesheet" href="/easy_gdb/css/easy_gdb.css">
-    <link rel="stylesheet" href="/easy_gdb/css/loading_datatable.css">
+    <link rel="stylesheet" href="/<?php echo $group;?>/css/easy_gdb.css">
+    <link rel="stylesheet" href="/<?php echo $group;?>/css/loading_datatable.css">
+    <link rel="stylesheet" href="/<?php echo $group;?>/css/tree.css">
 
 
     <?php
@@ -28,41 +40,25 @@ include_once "$conf_path/easyGDB_conf.php";
       }
     ?>
 
+
+
+
+
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.bootstrap4.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.5.5/css/colReorder.dataTables.min.css">
-    <!-- <link rel="stylesheet" href="/easy_gdb/css/datatables/datatables.bootstrap4.min.css"> -->
-    <!-- <link rel="stylesheet" href="/easy_gdb/css/datatables/buttons.bootstrap4.min.css"> -->
-    <!-- <link rel="stylesheet" href="/easy_gdb/css/datatables/colReorder.dataTables.min.css"> -->
 
 
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- <script src="/easy_gdb/js/jquery.min.js"></script> -->
 
     <!-- Popper JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <!-- <script src="/easy_gdb/js/popper.min.js"></script> -->
 
     <!-- compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- <script src="/easy_gdb/js/bootstrap.min.js"></script> -->
-    
 
-    <script src="/easy_gdb/js/download2.js"></script>
-
-    <!-- <script type="text/javascript" charset="utf8" src="/easy_gdb/js/Datatables/jquery.dataTables.min.js"></script> -->
-    <!-- <script type="text/javascript" charset="utf8" src="/easy_gdb/js/Datatables/dataTables.bootstrap4.min.js"></script> -->
-    <!-- <script type="text/javascript" charset="utf8" src="/easy_gdb/js/Datatables/dataTables.colReorder.min.js"></script> -->
-    <!-- <script type="text/javascript" charset="utf8" src="/easy_gdb/js/Datatables/dataTables.buttons.min.js"></script> -->
-    <!-- <script type="text/javascript" charset="utf8" src="/easy_gdb/js/Datatables/buttons.bootstrap4.min.js"></script> -->
-    <!-- <script type="text/javascript" charset="utf8" src="/easy_gdb/js/Datatables/buttons.colVis.min.js"></script> -->
-    <!-- <script type="text/javascript" charset="utf8" src="/easy_gdb/js/Datatables/buttons.html5.min.js"></script> -->
-    <!-- <script type="text/javascript" charset="utf8" src="/easy_gdb/js/Datatables/buttons.print.min.js"></script> -->
-    <!-- <script type="text/javascript" charset="utf8" src="/easy_gdb/js/Datatables/pdfmake.min.js"></script> -->
-    <!-- <script type="text/javascript" charset="utf8" src="/easy_gdb/js/Datatables/vfs_fonts.js"></script> -->
-
-    <!-- <script src="/easy_gdb/js/jszip.min.js" type="text/javascript"></script> -->
+    <script src="/<?php echo $group;?>/js/download2.js"></script>
 
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
@@ -91,8 +87,14 @@ include_once "$conf_path/easyGDB_conf.php";
 			}
 		?>
 
-<?php include_once 'toolbar.php';?>
 
+<?php
+if (file_exists("$root_path/$group/toolbar.php") ) {
+  include_once("$root_path/$group/toolbar.php");
+} elseif (file_exists("toolbar.php") ) {
+  include_once "toolbar.php";
+}
+?>
 
 <div class="page_container">
 
@@ -102,17 +104,17 @@ include_once "$conf_path/easyGDB_conf.php";
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Cookies policy</h5>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cookies policy</h4>
       </div>
       <div class="modal-body">
-        <p style="margin:0px">
+        <p>
           Jbrowse uses cookies to remember your configuration in the genome browser, such as track load and position.
           When using Jbrowse in this site you accept the use of these cookies.
         </p>
       </div>
       <div class="modal-footer">
-        <a id="jb_ok_cookies" href="/jbrowse/" target="_blank" type="button" class="btn btn-info">OK</a>
+        <a id="jb_ok_cookies" href="/jbrowse/" target="_blank" type="button" class="btn btn-default">OK</a>
       </div>
     </div>
 
@@ -145,6 +147,13 @@ include_once "$conf_path/easyGDB_conf.php";
     width:20px;
     overflow: hidden;
   }
+/*
+  .cover-img {
+    width: 100%;
+    height: auto;
+    visibility: hidden;
+  }
+*/
 
   .cover-title {
     position: absolute;
